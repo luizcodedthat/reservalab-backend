@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: reservalab
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/reserva_lab
+    driverClassName: org.postgresql.Driver
+    username: reservalab
+    password: reservalab
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
