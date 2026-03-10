@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: reservalab-db
+    environment:
+      POSTGRES_DB: reserva_lab
+      POSTGRES_USER: reservalab
+      POSTGRES_PASSWORD: reservalab
+    ports:
+      - "5432:5432"
+    volumes:
+      - reservalab_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  reservalab_data:
