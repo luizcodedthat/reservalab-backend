@@ -1,25 +1,52 @@
 package br.edu.ifpe.reservalab.model;
-
+ 
 import jakarta.persistence.*;
+<<<<<<< HEAD
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+=======
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+ 
+>>>>>>> c57f8e7 (feat: implementa busca e delecao parametrizadas)
 import java.time.LocalDateTime;
-
+ 
 @Entity
+<<<<<<< HEAD
 @Table(name = "laboratories", indexes = {
         @Index(name = "idx_laboratory_active", columnList = "active")
 })
+=======
+@Table(
+    name = "laboratories",
+    indexes = {
+        @Index(name = "idx_laboratory_active", columnList = "active"),
+        @Index(name = "idx_laboratory_code",   columnList = "code")
+    }
+)
+>>>>>>> c57f8e7 (feat: implementa busca e delecao parametrizadas)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+<<<<<<< HEAD
+=======
+@ToString(exclude = {"description"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+>>>>>>> c57f8e7 (feat: implementa busca e delecao parametrizadas)
 public class Laboratory {
-
+ 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "name", nullable = false, length = 255)
@@ -55,7 +82,7 @@ public class Laboratory {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
+ 
     @Version
     @Column(name = "version", nullable = false)
     private Long version;

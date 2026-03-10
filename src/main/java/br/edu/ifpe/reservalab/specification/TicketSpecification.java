@@ -25,13 +25,15 @@ public class TicketSpecification {
             }
             if (filter.getYear() != null) {
                 predicates.add(cb.equal(
-                        cb.function("YEAR", Integer.class, root.get("createdAt")),
+                        cb.function("date_part", Integer.class,
+                                cb.literal("year"), root.get("createdAt")),
                         filter.getYear()
                 ));
             }
             if (filter.getMonth() != null) {
                 predicates.add(cb.equal(
-                        cb.function("MONTH", Integer.class, root.get("createdAt")),
+                        cb.function("date_part", Integer.class,
+                                cb.literal("month"), root.get("createdAt")),
                         filter.getMonth()
                 ));
             }
