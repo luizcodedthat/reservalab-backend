@@ -5,13 +5,10 @@ import br.edu.ifpe.reservalab.model.Ticket.Status;
 import lombok.Data;
 
 @Data
-public class TicketDTO {
-    private Long laboratoryId;
-    private Long createdByUserId;
-    private Long assignedToUserId;
-    private String title;
-    private String description;
+public class TicketFilter {
+    private Long labId;
     private Status status;
     private Priority priority;
-    private String resolutionComment;
+    private Integer year;
+    private Integer month;
 }

@@ -68,4 +68,8 @@ public class Ticket {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 3c97441 (fix: correcao get e delete)
