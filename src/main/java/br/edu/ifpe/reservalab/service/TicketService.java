@@ -51,4 +51,16 @@ public class TicketService {
     public void delete(Long id) {
         ticketRepository.deleteById(id);
     }
+    
+    public TicketResponse update(Long id, TicketDTO dto) {
+    Ticket ticket = ticketRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Ticket não encontrado"));
+
+    ticket.setStatus(dto.getStatus());
+    ticket.setTitle(dto.getTitle());
+    ticket.setDescription(dto.getDescription());
+    ticket.setResolutionComment(dto.getResolutionComment());
+
+    return TicketResponse.from(ticketRepository.save(ticket));
+}
 }

@@ -41,6 +41,11 @@ public class TicketController {
         return ResponseEntity.status(201).body(ticketService.create(dto));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<TicketResponse> update(@PathVariable Long id, @RequestBody TicketDTO dto) {
+    return ResponseEntity.ok(ticketService.update(id, dto));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         ticketService.delete(id);
