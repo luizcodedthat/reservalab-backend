@@ -1,11 +1,14 @@
 package br.edu.ifpe.reservalab.service;
 
 import br.edu.ifpe.reservalab.dto.ReservationFilter;
+import br.edu.ifpe.reservalab.dto.ReservationRequest;
 import br.edu.ifpe.reservalab.dto.ReservationResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ReservationService {
+
+    ReservationResponse create(ReservationRequest request);
 
     Page<ReservationResponse> findAll(Pageable pageable);
 
