@@ -19,4 +19,8 @@ public interface ReservationService {
     void cancel(Long id);
 
     int cancelByFilter(ReservationFilter filter);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c57f8e7 (feat: implementa busca e delecao parametrizadas)
