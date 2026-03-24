@@ -1,7 +1,9 @@
 package br.edu.ifpe.reservalab.model;
 
+import br.edu.ifpe.reservalab.enums.TicketStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -30,7 +32,7 @@ public class Ticket {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status = Status.OPEN;
+    private TicketStatus status = TicketStatus.OPEN;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -50,10 +52,6 @@ public class Ticket {
     @Version
     private Long version;
 
-    public enum Status {
-        OPEN, IN_PROGRESS, PENDING, RESOLVED, CLOSED
-    }
-
     public enum Priority {
         LOW, MEDIUM, HIGH, URGENT
     }
@@ -68,8 +66,4 @@ public class Ticket {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 3c97441 (fix: correcao get e delete)
