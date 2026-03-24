@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +41,66 @@ public interface ReservationRepository
             countQuery = "SELECT COUNT(r) FROM Reservation r")
     Page<Reservation> findAllFetched(Pageable pageable);
 
+    @Query(value = """
+            SELECT r FROM Reservation r
+            JOIN FETCH r.laboratory
+            JOIN FETCH r.requestedBy
+            LEFT JOIN FETCH r.approvedBy
+            LEFT JOIN FETCH r.group
+            WHERE (:laboratoryId      IS NULL OR r.laboratory.id   = :laboratoryId)
+              AND (:requestedByUserId IS NULL OR r.requestedBy.id  = :requestedByUserId)
+              AND (:status            IS NULL OR r.status          = :status)
+              AND (:dateFrom          IS NULL OR r.reservationDate >= :dateFrom)
+              AND (:dateTo            IS NULL OR r.reservationDate <= :dateTo)
+              AND (:groupId           IS NULL OR r.group.id        = :groupId)
+            """,
+            countQuery = """
+            SELECT COUNT(r) FROM Reservation r
+            WHERE (:laboratoryId      IS NULL OR r.laboratory.id   = :laboratoryId)
+              AND (:requestedByUserId IS NULL OR r.requestedBy.id  = :requestedByUserId)
+              AND (:status            IS NULL OR r.status          = :status)
+              AND (:dateFrom          IS NULL OR r.reservationDate >= :dateFrom)
+              AND (:dateTo            IS NULL OR r.reservationDate <= :dateTo)
+              AND (:groupId           IS NULL OR r.group.id        = :groupId)
+            """)
+    Page<Reservation> findAllByFilter(
+            @Param("laboratoryId")      Long laboratoryId,
+            @Param("requestedByUserId") Long requestedByUserId,
+            @Param("status")            ReservationStatus status,
+            @Param("dateFrom")          LocalDate dateFrom,
+            @Param("dateTo")            LocalDate dateTo,
+            @Param("groupId")           Long groupId,
+            Pageable pageable
+    );
+
+    /**
+     * Detecta blocos de tempo que conflitam com os da reserva sendo criada.
+     *
+     * Dois blocos conflitam quando se sobrepõem no tempo:
+     *   existente.start < novo.end  AND  existente.end > novo.start
+     *
+     * Reservas CANCELLED e REJECTED são ignoradas — não ocupam o laboratório.
+     *
+     * Retorna os IDs das reservas conflitantes para cada bloco informado,
+     * permitindo que o service monte uma mensagem de erro detalhada.
+     */
+    @Query("""
+            SELECT r.id FROM Reservation r
+            JOIN r.timeBlocks tb
+            WHERE r.laboratory.id   = :laboratoryId
+              AND r.reservationDate = :date
+              AND r.status NOT IN :ignoredStatuses
+              AND tb.startTime      < :endTime
+              AND tb.endTime        > :startTime
+            """)
+    List<Long> findConflictingReservationIds(
+            @Param("laboratoryId")    Long laboratoryId,
+            @Param("date")            LocalDate date,
+            @Param("startTime")       LocalTime startTime,
+            @Param("endTime")         LocalTime endTime,
+            @Param("ignoredStatuses") List<ReservationStatus> ignoredStatuses
+    );
+
     @Query("""
             SELECT r.id FROM Reservation r
             WHERE r.group.id = :groupId
@@ -56,7 +118,7 @@ public interface ReservationRepository
             WHERE r.id IN :ids
             """)
     int bulkUpdateStatus(
-            @Param("ids") List<Long> ids,
+            @Param("ids")    List<Long> ids,
             @Param("status") ReservationStatus status
     );
 <<<<<<< HEAD

@@ -1,15 +1,22 @@
 package br.edu.ifpe.reservalab.controller;
 
 import br.edu.ifpe.reservalab.dto.ReservationFilter;
+import br.edu.ifpe.reservalab.dto.ReservationRequest;
 import br.edu.ifpe.reservalab.dto.ReservationResponse;
+import br.edu.ifpe.reservalab.enums.ReservationStatus;
 import br.edu.ifpe.reservalab.service.ReservationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
+import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
@@ -18,6 +25,19 @@ import java.util.Map;
 public class ReservationController {
 
     private final ReservationService reservationService;
+
+    @PostMapping
+    public ResponseEntity<ReservationResponse> create(@RequestBody @Valid ReservationRequest request) {
+        ReservationResponse response = reservationService.create(request);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.id())
+                .toUri();
+
+        return ResponseEntity.created(location).body(response);
+    }
 
     @GetMapping
     public ResponseEntity<Page<ReservationResponse>> listAll(
@@ -28,9 +48,17 @@ public class ReservationController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<ReservationResponse>> search(
-            @ModelAttribute ReservationFilter filter,
+            @RequestParam(required = false) Long laboratoryId,
+            @RequestParam(required = false) Long requestedByUserId,
+            @RequestParam(required = false) ReservationStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @RequestParam(required = false) Long groupId,
             @PageableDefault(size = 20, sort = "reservationDate") Pageable pageable
     ) {
+        ReservationFilter filter = new ReservationFilter(
+                laboratoryId, requestedByUserId, status, dateFrom, dateTo, groupId
+        );
         return ResponseEntity.ok(reservationService.findAllByFilter(filter, pageable));
     }
 
@@ -47,8 +75,15 @@ public class ReservationController {
 
     @DeleteMapping
     public ResponseEntity<Map<String, Integer>> cancelByFilter(
-            @ModelAttribute ReservationFilter filter
+            @RequestParam(required = false) Long laboratoryId,
+            @RequestParam(required = false) Long requestedByUserId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @RequestParam(required = false) Long groupId
     ) {
+        ReservationFilter filter = new ReservationFilter(
+                laboratoryId, requestedByUserId, null, dateFrom, dateTo, groupId
+        );
         int cancelled = reservationService.cancelByFilter(filter);
         return ResponseEntity.ok(Map.of("cancelled", cancelled));
     }
