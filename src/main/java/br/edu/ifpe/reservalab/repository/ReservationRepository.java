@@ -59,4 +59,8 @@ public interface ReservationRepository
             @Param("ids") List<Long> ids,
             @Param("status") ReservationStatus status
     );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c57f8e7 (feat: implementa busca e delecao parametrizadas)

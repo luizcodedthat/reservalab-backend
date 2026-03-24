@@ -52,4 +52,8 @@ public class ReservationController {
         int cancelled = reservationService.cancelByFilter(filter);
         return ResponseEntity.ok(Map.of("cancelled", cancelled));
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c57f8e7 (feat: implementa busca e delecao parametrizadas)
