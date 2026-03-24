@@ -2,7 +2,7 @@ package br.edu.ifpe.reservalab.dto;
 
 import br.edu.ifpe.reservalab.model.Ticket;
 import br.edu.ifpe.reservalab.model.Ticket.Priority;
-import br.edu.ifpe.reservalab.model.Ticket.Status;
+import br.edu.ifpe.reservalab.enums.TicketStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ public class TicketResponse {
     private Long assignedToUserId;
     private String title;
     private String description;
-    private Status status;
+    private TicketStatus status;
     private Priority priority;
     private String resolutionComment;
     private LocalDateTime resolvedAt;

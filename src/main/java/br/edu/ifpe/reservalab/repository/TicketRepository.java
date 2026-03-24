@@ -1,19 +1,23 @@
 package br.edu.ifpe.reservalab.repository;
 
+import br.edu.ifpe.reservalab.enums.TicketStatus;
 import br.edu.ifpe.reservalab.model.Ticket;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-@Repository
-<<<<<<< HEAD
-public interface TicketRepository extends JpaRepository<Ticket, Long> {
+import java.util.List;
 
-    List<Ticket> findByStatus(Status status);
+@Repository
+public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecificationExecutor<Ticket> {
+
+    List<Ticket> findByStatus(TicketStatus status);
 
     List<Ticket> findByLaboratoryId(Long laboratoryId);
 
-    List<Ticket> findByStatusAndLaboratoryId(Status status, Long laboratoryId);
+    List<Ticket> findByStatusAndLaboratoryId(TicketStatus status, Long laboratoryId);
 
     @Query("SELECT t FROM Ticket t WHERE YEAR(t.createdAt) = :year")
     List<Ticket> findByYear(@Param("year") int year);
@@ -21,7 +25,3 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query("SELECT t FROM Ticket t WHERE YEAR(t.createdAt) = :year AND MONTH(t.createdAt) = :month")
     List<Ticket> findByYearAndMonth(@Param("year") int year, @Param("month") int month);
 }
-=======
-public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecificationExecutor<Ticket> {
-}
->>>>>>> 3c97441 (fix: correcao get e delete)
