@@ -7,6 +7,7 @@ import br.edu.ifpe.reservalab.enums.ReservationStatus;
 import br.edu.ifpe.reservalab.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Map;
 
 @RestController
@@ -44,6 +46,17 @@ public class ReservationController {
             @PageableDefault(size = 20, sort = "reservationDate") Pageable pageable
     ) {
         return ResponseEntity.ok(reservationService.findAll(pageable));
+    }
+
+    @GetMapping("/today")
+    public ResponseEntity<Page<ReservationResponse>> listToday(
+            @PageableDefault(size = 20, sort = "laboratoryId") Pageable pageable
+    ) {
+        LocalDate today = LocalDate.now();
+        ReservationFilter todayFilter = new ReservationFilter(
+                null, null, null, today, today, null
+        );
+        return ResponseEntity.ok(reservationService.findAllByFilter(todayFilter, pageable));
     }
 
     @GetMapping("/search")
