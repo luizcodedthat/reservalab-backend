@@ -14,7 +14,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.Map;
@@ -46,6 +45,17 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.findAll(pageable));
     }
 
+    @GetMapping("/today")
+    public ResponseEntity<Page<ReservationResponse>> listToday(
+            @PageableDefault(size = 20, sort = "laboratoryId") Pageable pageable
+    ) {
+        LocalDate today = LocalDate.now();
+        ReservationFilter todayFilter = new ReservationFilter(
+                null, null, null, today, today, null
+        );
+        return ResponseEntity.ok(reservationService.findAllByFilter(todayFilter, pageable));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<Page<ReservationResponse>> search(
             @RequestParam(required = false) Long laboratoryId,
@@ -56,8 +66,12 @@ public class ReservationController {
             @RequestParam(required = false) Long groupId,
             @PageableDefault(size = 20, sort = "reservationDate") Pageable pageable
     ) {
+
+        LocalDate effectiveDateFrom = dateFrom != null ? dateFrom : LocalDate.now();
+        LocalDate effectiveDateTo = dateTo != null ? dateTo : LocalDate.now();
+
         ReservationFilter filter = new ReservationFilter(
-                laboratoryId, requestedByUserId, status, dateFrom, dateTo, groupId
+                laboratoryId, requestedByUserId, status, effectiveDateFrom, effectiveDateTo, groupId
         );
         return ResponseEntity.ok(reservationService.findAllByFilter(filter, pageable));
     }
