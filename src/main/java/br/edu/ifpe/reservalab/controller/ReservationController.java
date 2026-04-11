@@ -69,8 +69,12 @@ public class ReservationController {
             @RequestParam(required = false) Long groupId,
             @PageableDefault(size = 20, sort = "reservationDate") Pageable pageable
     ) {
+
+        LocalDate effectiveDateFrom = dateFrom != null ? dateFrom : LocalDate.now();
+        LocalDate effectiveDateTo = dateTo != null ? dateTo : LocalDate.now();
+
         ReservationFilter filter = new ReservationFilter(
-                laboratoryId, requestedByUserId, status, dateFrom, dateTo, groupId
+                laboratoryId, requestedByUserId, status, effectiveDateFrom, effectiveDateTo, groupId
         );
         return ResponseEntity.ok(reservationService.findAllByFilter(filter, pageable));
     }
