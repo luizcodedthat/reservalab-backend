@@ -19,4 +19,4 @@ ai:
   free-llm:
     base-url: https://apifreellm.com
     api-key: ${AI_API_KEY}
-    timeout-seconds: 60
+    timeout-seconds: 120
