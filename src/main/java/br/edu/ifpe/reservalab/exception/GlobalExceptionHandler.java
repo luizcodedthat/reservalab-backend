@@ -1,11 +1,15 @@
 package br.edu.ifpe.reservalab.exception;
 
+import br.edu.ifpe.reservalab.dto.ai.NoLabsAvailableException;
 import br.edu.ifpe.reservalab.dto.error.ConflictErrorResponse;
 import br.edu.ifpe.reservalab.dto.error.ConflictErrorResponse.ConflictItem;
 import br.edu.ifpe.reservalab.dto.error.ErrorResponse;
 import br.edu.ifpe.reservalab.dto.error.ValidationErrorResponse;
 import br.edu.ifpe.reservalab.dto.error.ValidationErrorResponse.FieldViolation;
+import br.edu.ifpe.reservalab.exception.ai.AiProviderException;
+import br.edu.ifpe.reservalab.exception.ai.AiRateLimitException;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -75,5 +80,38 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(AiProviderException.class)
+    public ResponseEntity<ErrorResponse> handleAiProviderException(AiProviderException ex) {
+        log.error("Erro no provedor de IA: {}", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ErrorResponse.of(
+                        HttpStatus.SERVICE_UNAVAILABLE,
+                        "Serviço de IA indisponível. Tente novamente."
+                ));
+    }
+
+    @ExceptionHandler(AiRateLimitException.class)
+    public ResponseEntity<ErrorResponse> handleAiRateLimit(AiRateLimitException ex) {
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .header("Retry-After", "40")
+                .body(ErrorResponse.of(
+                        HttpStatus.TOO_MANY_REQUESTS,
+                        ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(NoLabsAvailableException.class)
+    public ResponseEntity<ErrorResponse> handleNoLabsAvailable(NoLabsAvailableException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ErrorResponse.of(
+                        HttpStatus.SERVICE_UNAVAILABLE,
+                        "Serviço de IA indisponível. Tente novamente."
+                ));
     }
 }
