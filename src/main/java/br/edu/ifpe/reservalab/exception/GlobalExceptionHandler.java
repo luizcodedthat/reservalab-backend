@@ -108,10 +108,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoLabsAvailableException.class)
     public ResponseEntity<ErrorResponse> handleNoLabsAvailable(NoLabsAvailableException ex) {
         return ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .status(HttpStatus.UNPROCESSABLE_CONTENT)
                 .body(ErrorResponse.of(
-                        HttpStatus.SERVICE_UNAVAILABLE,
-                        "Serviço de IA indisponível. Tente novamente."
+                        HttpStatus.UNPROCESSABLE_CONTENT,
+                        ex.getMessage()
                 ));
     }
 }
