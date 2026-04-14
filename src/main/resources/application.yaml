@@ -2,6 +2,10 @@ spring:
   application:
     name: reservalab
 
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+
   datasource:
     url: jdbc:postgresql://localhost:5432/reserva_lab
     driverClassName: org.postgresql.Driver
@@ -20,3 +24,6 @@ ai:
     base-url: https://apifreellm.com
     api-key: ${AI_API_KEY}
     timeout-seconds: 120
+jwt:
+  secret: meuSegredoMuitoForteComMaisDe32Caracteres123
+  expiration-ms: 86400000
