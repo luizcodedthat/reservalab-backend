@@ -60,6 +60,7 @@ public class TicketService {
     ticket.setTitle(dto.getTitle());
     ticket.setDescription(dto.getDescription());
     ticket.setResolutionComment(dto.getResolutionComment());
+    ticket.setLaboratoryId(dto.getLaboratoryId());
 
     return TicketResponse.from(ticketRepository.save(ticket));
 }
