@@ -77,6 +77,7 @@ public class TicketService {
         ticket.setDescription(dto.getDescription());
         ticket.setResolutionComment(dto.getResolutionComment());
         ticket.setLaboratoryId(dto.getLaboratoryId());
+        ticket.setPriority(dto.getPriority());
 
         return TicketResponse.from(ticketRepository.save(ticket));
     }
