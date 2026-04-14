@@ -53,15 +53,16 @@ public class TicketService {
     }
     
     public TicketResponse update(Long id, TicketDTO dto) {
-    Ticket ticket = ticketRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Ticket não encontrado"));
+        Ticket ticket = ticketRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Ticket não encontrado"));
 
-    ticket.setStatus(dto.getStatus());
-    ticket.setTitle(dto.getTitle());
-    ticket.setDescription(dto.getDescription());
-    ticket.setResolutionComment(dto.getResolutionComment());
-    ticket.setLaboratoryId(dto.getLaboratoryId());
+        ticket.setStatus(dto.getStatus());
+        ticket.setTitle(dto.getTitle());
+        ticket.setDescription(dto.getDescription());
+        ticket.setResolutionComment(dto.getResolutionComment());
+        ticket.setLaboratoryId(dto.getLaboratoryId());
+        ticket.setPriority(dto.getPriority());
 
-    return TicketResponse.from(ticketRepository.save(ticket));
-}
+        return TicketResponse.from(ticketRepository.save(ticket));
+    }
 }
