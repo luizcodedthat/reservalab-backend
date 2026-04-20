@@ -3,6 +3,8 @@ package br.edu.ifpe.reservalab.service;
 import br.edu.ifpe.reservalab.dto.TicketDTO;
 import br.edu.ifpe.reservalab.dto.TicketFilter;
 import br.edu.ifpe.reservalab.dto.TicketResponse;
+import br.edu.ifpe.reservalab.dto.TicketClassificationRequest; 
+import br.edu.ifpe.reservalab.dto.TicketClassificationResponse; 
 import br.edu.ifpe.reservalab.enums.TicketStatus;
 import br.edu.ifpe.reservalab.model.Ticket;
 import br.edu.ifpe.reservalab.repository.TicketRepository;
@@ -11,12 +13,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class TicketService {
 
     private final TicketRepository ticketRepository;
+    private final TicketClassificationService classificationService; // Injeção do serviço de IA
 
     public Page<TicketResponse> findAll(Pageable pageable) {
         return ticketRepository.findAll(pageable)
@@ -34,15 +38,26 @@ public class TicketService {
         return TicketResponse.from(ticket);
     }
 
+    @Transactional
     public TicketResponse create(TicketDTO dto) {
+        
+        TicketClassificationResponse aiClassification = classificationService.classify(
+                new TicketClassificationRequest(dto.getTitle(), dto.getDescription())
+        );
+
         Ticket ticket = new Ticket();
         ticket.setLaboratoryId(dto.getLaboratoryId());
         ticket.setCreatedByUserId(dto.getCreatedByUserId());
         ticket.setAssignedToUserId(dto.getAssignedToUserId());
         ticket.setTitle(dto.getTitle());
         ticket.setDescription(dto.getDescription());
+        
+       
         ticket.setStatus(dto.getStatus() != null ? dto.getStatus() : TicketStatus.OPEN);
-        ticket.setPriority(dto.getPriority() != null ? dto.getPriority() : Ticket.Priority.MEDIUM);
+        
+        
+        ticket.setPriority(aiClassification.priority());
+        
         ticket.setResolutionComment(dto.getResolutionComment());
 
         return TicketResponse.from(ticketRepository.save(ticket));
@@ -52,6 +67,7 @@ public class TicketService {
         ticketRepository.deleteById(id);
     }
     
+    @Transactional
     public TicketResponse update(Long id, TicketDTO dto) {
         Ticket ticket = ticketRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Ticket não encontrado"));
