@@ -1,0 +1,1 @@
+ALTER TABLE laboratory_comments DROP COLUMN IF EXISTS rating;

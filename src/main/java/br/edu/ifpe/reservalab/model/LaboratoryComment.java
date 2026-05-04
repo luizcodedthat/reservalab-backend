@@ -1,7 +1,5 @@
 package br.edu.ifpe.reservalab.model;
 
-import br.edu.ifpe.reservalab.model.Laboratory;
-import br.edu.ifpe.reservalab.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

@@ -68,7 +68,7 @@ public class UserService {
                 .username(dto.getUsername())
                 .email(dto.getEmail())
                 .passwordHash(passwordEncoder.encode(dto.getPassword()))
-                .role(dto.getRole())
+                .role(UserRole.STUDENT)
                 .active(true)
                 .build();
 

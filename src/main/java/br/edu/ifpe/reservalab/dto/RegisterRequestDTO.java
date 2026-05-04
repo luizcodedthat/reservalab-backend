@@ -1,9 +1,7 @@
 package br.edu.ifpe.reservalab.dto;
 
-import br.edu.ifpe.reservalab.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -22,9 +20,6 @@ public class RegisterRequestDTO {
     private String email;
 
     @NotBlank(message = "Senha é obrigatória")
-    @Size(min = 6, message = "Senha deve ter ao menos 6 caracteres")
+    @Size(min = 8, message = "Senha deve ter ao menos 8 caracteres")
     private String password;
-
-    @NotNull(message = "Perfil é obrigatório")
-    private UserRole role;
 }
