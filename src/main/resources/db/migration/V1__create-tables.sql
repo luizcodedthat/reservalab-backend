@@ -151,7 +151,6 @@ CREATE TABLE laboratory_comments (
                                      laboratory_id   BIGINT      NOT NULL,
                                      author_user_id  BIGINT      NOT NULL,
                                      content         TEXT        NOT NULL,
-                                     rating          INTEGER,
                                      deleted         BOOLEAN     NOT NULL DEFAULT FALSE,
                                      edited_at       TIMESTAMP,
                                      created_at      TIMESTAMP   NOT NULL DEFAULT NOW(),
@@ -159,8 +158,7 @@ CREATE TABLE laboratory_comments (
                                      version         BIGINT      NOT NULL DEFAULT 0,
 
                                      CONSTRAINT fk_lab_comment_lab       FOREIGN KEY (laboratory_id)   REFERENCES laboratories (id) ON DELETE CASCADE,
-                                     CONSTRAINT fk_lab_comment_author    FOREIGN KEY (author_user_id)  REFERENCES users (id),
-                                     CONSTRAINT ck_lab_comment_rating    CHECK (rating IS NULL OR rating BETWEEN 1 AND 5)
+                                     CONSTRAINT fk_lab_comment_author    FOREIGN KEY (author_user_id)  REFERENCES users (id)
 );
 
 CREATE INDEX idx_lab_comment_lab     ON laboratory_comments (laboratory_id);

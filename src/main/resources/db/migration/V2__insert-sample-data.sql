@@ -275,31 +275,30 @@ FROM tickets t WHERE t.title = 'Atualização do PostgreSQL';
 -- LABORATORY COMMENTS
 -- ----------------------------------------
 
-INSERT INTO laboratory_comments (laboratory_id, author_user_id, content, rating) VALUES
-                                                                                     ((SELECT id FROM laboratories WHERE code = 'LAB-REDES'),
-                                                                                      (SELECT id FROM users        WHERE username = 'joao.silva'),
-                                                                                      'Ótimo laboratório, computadores rápidos e bem configurados.', 5),
+INSERT INTO laboratory_comments (laboratory_id, author_user_id, content) VALUES
+                                                                             ((SELECT id FROM laboratories WHERE code = 'LAB-REDES'),
+                                                                              (SELECT id FROM users        WHERE username = 'joao.silva'),
+                                                                              'Ótimo laboratório, computadores rápidos e bem configurados.'),
 
-                                                                                     ((SELECT id FROM laboratories WHERE code = 'LAB-REDES'),
-                                                                                      (SELECT id FROM users        WHERE username = 'maria.souza'),
-                                                                                      'Ambiente agradável, mas poderia ter mais tomadas.', 4),
+                                                                             ((SELECT id FROM laboratories WHERE code = 'LAB-REDES'),
+                                                                              (SELECT id FROM users        WHERE username = 'maria.souza'),
+                                                                              'Ambiente agradável, mas poderia ter mais tomadas.'),
 
-                                                                                     ((SELECT id FROM laboratories WHERE code = 'LAB-SW'),
-                                                                                      (SELECT id FROM users        WHERE username = 'joao.silva'),
-                                                                                      'Muito bom para desenvolvimento, IDEs sempre atualizadas.', 5),
+                                                                             ((SELECT id FROM laboratories WHERE code = 'LAB-SW'),
+                                                                              (SELECT id FROM users        WHERE username = 'joao.silva'),
+                                                                              'Muito bom para desenvolvimento, IDEs sempre atualizadas.'),
 
-                                                                                     ((SELECT id FROM laboratories WHERE code = 'LAB-SW'),
-                                                                                      (SELECT id FROM users        WHERE username = 'carlos.lima'),
-                                                                                      'Excelente estrutura para as aulas.', 5),
+                                                                             ((SELECT id FROM laboratories WHERE code = 'LAB-SW'),
+                                                                              (SELECT id FROM users        WHERE username = 'carlos.lima'),
+                                                                              'Excelente estrutura para as aulas.'),
 
-                                                                                     ((SELECT id FROM laboratories WHERE code = 'LAB-HW'),
-                                                                                      (SELECT id FROM users        WHERE username = 'maria.souza'),
-                                                                                      'Ferramentas básicas disponíveis, mas faltam algumas peças.', 3),
+                                                                             ((SELECT id FROM laboratories WHERE code = 'LAB-HW'),
+                                                                              (SELECT id FROM users        WHERE username = 'maria.souza'),
+                                                                              'Ferramentas básicas disponíveis, mas faltam algumas peças.'),
 
-                                                                                     ((SELECT id FROM laboratories WHERE code = 'LAB-BD'),
-                                                                                      (SELECT id FROM users        WHERE username = 'ana.rocha'),
-                                                                                      'Banco de dados bem configurado. Ideal para as aulas.', 4);
-
+                                                                             ((SELECT id FROM laboratories WHERE code = 'LAB-BD'),
+                                                                              (SELECT id FROM users        WHERE username = 'ana.rocha'),
+                                                                              'Banco de dados bem configurado. Ideal para as aulas.');
 -- ----------------------------------------
 -- COMMENT VOTES
 -- ----------------------------------------
