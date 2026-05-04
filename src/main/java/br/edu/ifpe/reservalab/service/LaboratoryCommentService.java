@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface LaboratoryCommentService {
 
-    Page<LaboratoryCommentResponse> findByLaboratory(Long laboratoryId, Pageable pageable);
+    Page<LaboratoryCommentResponse> findByLaboratory(Long laboratoryId, Pageable pageable, Long userId);
 
     LaboratoryCommentResponse create(Long laboratoryId, LaboratoryCommentRequest request);
 

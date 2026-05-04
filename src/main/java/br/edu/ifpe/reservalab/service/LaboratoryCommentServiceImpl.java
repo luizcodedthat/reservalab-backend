@@ -3,7 +3,9 @@ package br.edu.ifpe.reservalab.service;
 import br.edu.ifpe.reservalab.dto.CommentVoteSummary;
 import br.edu.ifpe.reservalab.dto.LaboratoryCommentRequest;
 import br.edu.ifpe.reservalab.dto.LaboratoryCommentResponse;
+import br.edu.ifpe.reservalab.dto.UserCommentVote;
 import br.edu.ifpe.reservalab.enums.VoteType;
+import br.edu.ifpe.reservalab.model.CommentVote;
 import br.edu.ifpe.reservalab.model.Laboratory;
 import br.edu.ifpe.reservalab.model.LaboratoryComment;
 import br.edu.ifpe.reservalab.model.User;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,25 +38,35 @@ public class LaboratoryCommentServiceImpl implements LaboratoryCommentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<LaboratoryCommentResponse> findByLaboratory(Long laboratoryId, Pageable pageable) {
+    public Page<LaboratoryCommentResponse> findByLaboratory(Long laboratoryId, Pageable pageable, Long userId) {
         if (!laboratoryRepository.existsById(laboratoryId)) {
             throw new EntityNotFoundException("Laboratório não encontrado: id=" + laboratoryId);
         }
 
-        Page<LaboratoryComment> comments = commentRepository
-                .findActiveByLaboratoryId(laboratoryId, pageable);
+        Page<LaboratoryComment> comments = commentRepository.findActiveByLaboratoryId(laboratoryId, pageable);
 
         List<Long> commentIds = comments.stream()
                 .map(LaboratoryComment::getId)
                 .toList();
 
-        Map<Long, Long> upvotes   = countVotesByType(commentIds, VoteType.UPVOTE);
+        // Contadores gerais de votos
+        Map<Long, Long> upvotes = countVotesByType(commentIds, VoteType.UPVOTE);
         Map<Long, Long> downvotes = countVotesByType(commentIds, VoteType.DOWNVOTE);
 
+        // Map do voto do usuário para cada comentário
+        Map<Long, VoteType> userVotes = voteRepository.findVotesByUserAndCommentIds(userId, commentIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        UserCommentVote::commentId,
+                        UserCommentVote::voteType
+                ));
+
+        // Monta o DTO incluindo o voto do usuário
         return comments.map(comment -> LaboratoryCommentResponse.from(
                 comment,
                 upvotes.getOrDefault(comment.getId(), 0L),
-                downvotes.getOrDefault(comment.getId(), 0L)
+                downvotes.getOrDefault(comment.getId(), 0L),
+                userVotes.get(comment.getId()) // aqui entra o voto do usuário
         ));
     }
 
@@ -80,7 +93,7 @@ public class LaboratoryCommentServiceImpl implements LaboratoryCommentService {
                 saved.getId(), laboratoryId, author.getUsername());
 
         // Comentário recém-criado — zero votos
-        return LaboratoryCommentResponse.from(saved, 0L, 0L);
+        return LaboratoryCommentResponse.from(saved, 0L, 0L, null);
     }
 
     @Override
