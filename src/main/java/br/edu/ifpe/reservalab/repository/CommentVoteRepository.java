@@ -25,6 +25,4 @@ public interface CommentVoteRepository extends JpaRepository<CommentVote, Long> 
     List<CommentVoteSummary> findVoteSummariesByCommentIds(
             @Param("commentIds") List<Long> commentIds
     );
-
-    boolean existsByCommentIdAndUserId(Long commentId, Long userId);
 }
