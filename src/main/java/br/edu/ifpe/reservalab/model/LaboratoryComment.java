@@ -6,11 +6,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "laboratory_comments", indexes = {
-        @Index(name = "idx_lab_comment_lab",     columnList = "laboratory_id"),
-        @Index(name = "idx_lab_comment_author",  columnList = "author_user_id"),
+        @Index(name = "idx_lab_comment_lab", columnList = "laboratory_id"),
+        @Index(name = "idx_lab_comment_author", columnList = "author_user_id"),
         @Index(name = "idx_lab_comment_deleted", columnList = "deleted")
 })
 @Getter
@@ -56,4 +58,13 @@ public class LaboratoryComment {
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
+
+    @OneToMany(
+            mappedBy = "comment",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    private Set<CommentVote> votes = new HashSet<>();
 }

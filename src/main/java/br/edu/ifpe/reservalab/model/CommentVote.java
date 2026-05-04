@@ -8,16 +8,16 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "comment_votes", indexes = {
-        @Index(name = "idx_vote_user_comment", columnList = "user_id, comment_id", unique = true),
-        @Index(name = "idx_vote_comment",      columnList = "comment_id")
-})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "comment_votes", indexes = {
+        @Index(name = "idx_vote_user_comment", columnList = "user_id, comment_id", unique = true),
+        @Index(name = "idx_vote_comment",      columnList = "comment_id")
+})
 public class CommentVote {
 
     @Id
