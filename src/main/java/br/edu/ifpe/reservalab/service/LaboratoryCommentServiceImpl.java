@@ -16,6 +16,8 @@ import br.edu.ifpe.reservalab.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -73,26 +75,29 @@ public class LaboratoryCommentServiceImpl implements LaboratoryCommentService {
     @Override
     @Transactional
     public LaboratoryCommentResponse create(Long laboratoryId, LaboratoryCommentRequest request) {
+
         Laboratory laboratory = laboratoryRepository.findById(laboratoryId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Laboratório não encontrado: id=" + laboratoryId));
 
-        User author = userRepository.findById(request.authorId())
+        // Pega usuário logado do JWT
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User loggedUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Usuário não encontrado: id=" + request.authorId()));
+                        "Usuário não encontrado com email: " + email));
 
         LaboratoryComment comment = LaboratoryComment.builder()
                 .laboratory(laboratory)
-                .author(author)
+                .author(loggedUser)
                 .content(request.content())
                 .build();
 
         LaboratoryComment saved = commentRepository.save(comment);
 
         log.info("Comentário criado: id={}, lab={}, autor={}",
-                saved.getId(), laboratoryId, author.getUsername());
+                saved.getId(), laboratoryId, loggedUser.getEmail());
 
-        // Comentário recém-criado — zero votos
         return LaboratoryCommentResponse.from(saved, 0L, 0L, null);
     }
 

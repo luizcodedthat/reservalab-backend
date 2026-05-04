@@ -35,7 +35,7 @@ public class LaboratoryCommentController {
         Long userId = null;
 
         if (email != null) {
-            User user = userService.getEntityByEmail(email); // busca usuário logado
+            User user = userService.getEntityByEmail(email);
             userId = user.getId();
         }
 
