@@ -3,6 +3,7 @@ package br.edu.ifpe.reservalab.controller;
 import br.edu.ifpe.reservalab.dto.ReservationFilter;
 import br.edu.ifpe.reservalab.dto.ReservationRequest;
 import br.edu.ifpe.reservalab.dto.ReservationResponse;
+import br.edu.ifpe.reservalab.dto.ReservationUpdateRequest;
 import br.edu.ifpe.reservalab.enums.ReservationStatus;
 import br.edu.ifpe.reservalab.service.ReservationService;
 import jakarta.validation.Valid;
@@ -40,19 +41,16 @@ public class ReservationController {
 
     @GetMapping
     public ResponseEntity<Page<ReservationResponse>> listAll(
-            @PageableDefault(size = 20, sort = "reservationDate") Pageable pageable
-    ) {
+            @PageableDefault(size = 20, sort = "reservationDate") Pageable pageable) {
         return ResponseEntity.ok(reservationService.findAll(pageable));
     }
 
     @GetMapping("/today")
     public ResponseEntity<Page<ReservationResponse>> listToday(
-            @PageableDefault(size = 20, sort = "laboratoryId") Pageable pageable
-    ) {
+            @PageableDefault(size = 20, sort = "laboratoryId") Pageable pageable) {
         LocalDate today = LocalDate.now();
         ReservationFilter todayFilter = new ReservationFilter(
-                null, null, null, today, today, null
-        );
+                null, null, null, today, today, null);
         return ResponseEntity.ok(reservationService.findAllByFilter(todayFilter, pageable));
     }
 
@@ -64,21 +62,26 @@ public class ReservationController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
             @RequestParam(required = false) Long groupId,
-            @PageableDefault(size = 20, sort = "reservationDate") Pageable pageable
-    ) {
+            @PageableDefault(size = 20, sort = "reservationDate") Pageable pageable) {
 
         LocalDate effectiveDateFrom = dateFrom != null ? dateFrom : LocalDate.now();
         LocalDate effectiveDateTo = dateTo != null ? dateTo : LocalDate.now();
 
         ReservationFilter filter = new ReservationFilter(
-                laboratoryId, requestedByUserId, status, effectiveDateFrom, effectiveDateTo, groupId
-        );
+                laboratoryId, requestedByUserId, status, effectiveDateFrom, effectiveDateTo, groupId);
         return ResponseEntity.ok(reservationService.findAllByFilter(filter, pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(reservationService.findById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ReservationResponse> update(
+            @PathVariable Long id,
+            @RequestBody @Valid ReservationUpdateRequest request) {
+        return ResponseEntity.ok(reservationService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
@@ -93,11 +96,9 @@ public class ReservationController {
             @RequestParam(required = false) Long requestedByUserId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
-            @RequestParam(required = false) Long groupId
-    ) {
+            @RequestParam(required = false) Long groupId) {
         ReservationFilter filter = new ReservationFilter(
-                laboratoryId, requestedByUserId, null, dateFrom, dateTo, groupId
-        );
+                laboratoryId, requestedByUserId, null, dateFrom, dateTo, groupId);
         int cancelled = reservationService.cancelByFilter(filter);
         return ResponseEntity.ok(Map.of("cancelled", cancelled));
     }
