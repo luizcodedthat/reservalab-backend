@@ -9,13 +9,11 @@ public record LaboratoryCommentResponse(
         Long authorId,
         String authorName,
         String content,
-        Integer rating,
         long upvotes,
         long downvotes,
         LocalDateTime editedAt,
         LocalDateTime createdAt
 ) {
-
     public static LaboratoryCommentResponse from(LaboratoryComment comment,
                                                  long upvotes,
                                                  long downvotes) {
@@ -24,7 +22,6 @@ public record LaboratoryCommentResponse(
                 comment.getAuthor().getId(),
                 comment.getAuthor().getName(),
                 comment.getContent(),
-                comment.getRating(),
                 upvotes,
                 downvotes,
                 comment.getEditedAt(),
