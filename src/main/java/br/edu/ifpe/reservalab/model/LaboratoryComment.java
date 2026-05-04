@@ -1,5 +1,7 @@
 package br.edu.ifpe.reservalab.model;
 
+import br.edu.ifpe.reservalab.model.Laboratory;
+import br.edu.ifpe.reservalab.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,6 +37,9 @@ public class LaboratoryComment {
     @Column(name = "content", nullable = false, columnDefinition = "text")
     private String content;
 
+    @Column(name = "rating")
+    private Integer rating;
+
     @Column(name = "deleted", nullable = false)
     @Builder.Default
     private boolean deleted = false;
@@ -53,12 +58,4 @@ public class LaboratoryComment {
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
-
-    // ----------------------------------------
-    // Domain helpers
-    // ----------------------------------------
-
-    public boolean isDeleted() {
-        return deleted;
-    }
 }

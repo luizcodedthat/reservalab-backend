@@ -10,6 +10,4 @@ public interface LaboratoryService {
     Page<LaboratoryResponse> findAll(Pageable pageable);
 
     LaboratoryResponse findById(Long id);
-
-    Page<LaboratoryCommentResponse> findComments(Long laboratoryId, Pageable pageable);
 }
