@@ -37,9 +37,6 @@ public class LaboratoryComment {
     @Column(name = "content", nullable = false, columnDefinition = "text")
     private String content;
 
-    @Column(name = "rating")
-    private Integer rating;
-
     @Column(name = "deleted", nullable = false)
     @Builder.Default
     private boolean deleted = false;
