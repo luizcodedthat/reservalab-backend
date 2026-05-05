@@ -12,4 +12,6 @@ public interface LaboratoryRepository extends JpaRepository<Laboratory, Long> {
     Optional<Laboratory> findByCode(String code);
 
     boolean existsByCode(String code);
+
+    
 }
