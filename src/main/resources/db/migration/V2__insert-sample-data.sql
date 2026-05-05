@@ -1,7 +1,7 @@
 -- ========================================
 -- V2__insert_sample_data.sql
 -- ========================================
--- Senhas: todas são "password123" (bcrypt)
+-- Senhas: todas são "L!123456" (bcrypt)
 -- IDs não são referenciados diretamente — todas as FKs usam subqueries
 -- para evitar problemas com sequências BIGSERIAL após rollbacks.
 
@@ -10,13 +10,15 @@
 -- ----------------------------------------
 
 INSERT INTO users (username, email, password_hash, name, role, active) VALUES
-                                                                           ('joao.silva',   'joao.silva@uni.edu',   '$2a$10$7EqJtq98hPqEX7fNZaFWoOe2j1XnRSJiyz7VMF5yY5QZdlCNLKc1G', 'João Silva',      'STUDENT',    TRUE),
-                                                                           ('maria.souza',  'maria.souza@uni.edu',  '$2a$10$7EqJtq98hPqEX7fNZaFWoOe2j1XnRSJiyz7VMF5yY5QZdlCNLKc1G', 'Maria Souza',     'STUDENT',    TRUE),
-                                                                           ('carlos.lima',  'carlos.lima@uni.edu',  '$2a$10$7EqJtq98hPqEX7fNZaFWoOe2j1XnRSJiyz7VMF5yY5QZdlCNLKc1G', 'Carlos Lima',     'PROFESSOR',  TRUE),
-                                                                           ('ana.rocha',    'ana.rocha@uni.edu',    '$2a$10$7EqJtq98hPqEX7fNZaFWoOe2j1XnRSJiyz7VMF5yY5QZdlCNLKc1G', 'Ana Rocha',       'PROFESSOR',  TRUE),
-                                                                           ('paula.mendes', 'paula.mendes@uni.edu', '$2a$10$7EqJtq98hPqEX7fNZaFWoOe2j1XnRSJiyz7VMF5yY5QZdlCNLKc1G', 'Paula Mendes',    'SECRETARY',  TRUE),
-                                                                           ('lucas.tech',   'lucas.tech@uni.edu',   '$2a$10$7EqJtq98hPqEX7fNZaFWoOe2j1XnRSJiyz7VMF5yY5QZdlCNLKc1G', 'Lucas Técnico',   'TECHNICIAN', TRUE),
-                                                                           ('ativo.false',  'inativo@uni.edu',      '$2a$10$7EqJtq98hPqEX7fNZaFWoOe2j1XnRSJiyz7VMF5yY5QZdlCNLKc1G', 'Usuário Inativo', 'STUDENT',    FALSE);
+                                                                           ('joao.silva',   'joao.silva@uni.edu',   '$2a$10$rnuVeiudMavVc1FIN4V3V.vv/jrQVRJlnuObVnyXtx7a/iHwSFxUK', 'João Silva',      'STUDENT',    TRUE),
+                                                                           ('maria.souza',  'maria.souza@uni.edu',  '$2a$10$rnuVeiudMavVc1FIN4V3V.vv/jrQVRJlnuObVnyXtx7a/iHwSFxUK', 'Maria Souza',     'STUDENT',    TRUE),
+                                                                           ('carlos.lima',  'carlos.lima@uni.edu',  '$2a$10$rnuVeiudMavVc1FIN4V3V.vv/jrQVRJlnuObVnyXtx7a/iHwSFxUK', 'Carlos Lima',     'PROFESSOR',  TRUE),
+                                                                           ('ana.rocha',    'ana.rocha@uni.edu',    '$2a$10$rnuVeiudMavVc1FIN4V3V.vv/jrQVRJlnuObVnyXtx7a/iHwSFxUK', 'Ana Rocha',       'PROFESSOR',  TRUE),
+                                                                           ('paula.mendes', 'paula.mendes@uni.edu', '$2a$10$rnuVeiudMavVc1FIN4V3V.vv/jrQVRJlnuObVnyXtx7a/iHwSFxUK', 'Paula Mendes',    'SECRETARY',  TRUE),
+                                                                           ('lucas.tech',   'lgsl3@discente.ifpe.edu.br',   '$2a$10$rnuVeiudMavVc1FIN4V3V.vv/jrQVRJlnuObVnyXtx7a/iHwSFxUK', 'Lucas Técnico',   'TECHNICIAN', TRUE),
+                                                                           ('pedro.sec',   'pgsl@discente.ifpe.edu.br',   '$2a$10$rnuVeiudMavVc1FIN4V3V.vv/jrQVRJlnuObVnyXtx7a/iHwSFxUK', 'Pedro Secretaria',   'SECRETARY', TRUE),
+                                                                           ('luiz.prof',   'les17@discente.ifpe.edu.br',   '$2a$10$rnuVeiudMavVc1FIN4V3V.vv/jrQVRJlnuObVnyXtx7a/iHwSFxUK', 'Luiz Professor',   'PROFESSOR', TRUE),
+                                                                           ('ativo.false',  'inativo@uni.edu',      '$2a$10$rnuVeiudMavVc1FIN4V3V.vv/jrQVRJlnuObVnyXtx7a/iHwSFxUK', 'Usuário Inativo', 'STUDENT',    FALSE);
 
 -- ----------------------------------------
 -- LABORATORIES
