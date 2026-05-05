@@ -262,7 +262,7 @@ public class ReservationServiceImpl implements ReservationService {
                                 .reservationDate(request.reservationDate())
                                 .purpose(request.purpose())
                                 .notes(request.notes())
-                                .status(ReservationStatus.PENDING)
+                                .status(ReservationStatus.APPROVED)
                                 .totalDurationMinutes(totalDuration)
                                 .build();
 
