@@ -1,8 +1,9 @@
 package br.edu.ifpe.reservalab.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import br.edu.ifpe.reservalab.enums.UserRole;
 
 public record TicketClassificationRequest(
-    @NotBlank String title,
-    @NotBlank String description
+        String title,
+        String description,
+        UserRole userRole   // recebido do token JWT (por ora, do request)
 ) {}
