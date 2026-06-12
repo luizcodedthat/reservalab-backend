@@ -18,6 +18,10 @@ ai:
     base-url: https://apifreellm.com
     api-key: ${AI_API_KEY}
     timeout-seconds: 120
+  embedding:
+    base-url: https://api-inference.huggingface.co
+    api-key: ${HF_API_KEY}
+    model: sentence-transformers/all-MiniLM-L6-v2
 
 jwt:
   secret: ${JWT_SECRET}

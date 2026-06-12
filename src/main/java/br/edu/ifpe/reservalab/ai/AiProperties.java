@@ -9,11 +9,18 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public record AiProperties(
         @NotBlank String provider,
-        FreeLlm freeLlm
+        FreeLlm freeLlm,
+        Embedding embedding
 ) {
     public record FreeLlm(
             @NotBlank String baseUrl,
             @NotBlank String apiKey,
             @Positive int timeoutSeconds
+    ) {}
+
+    public record Embedding(
+            @NotBlank String baseUrl,
+            @NotBlank String apiKey,
+            @NotBlank String model
     ) {}
 }
