@@ -1,8 +1,7 @@
 package br.edu.ifpe.reservalab.controller;
 
-import br.edu.ifpe.reservalab.dto.TicketDTO;
-import br.edu.ifpe.reservalab.dto.TicketFilter;
-import br.edu.ifpe.reservalab.dto.TicketResponse;
+import br.edu.ifpe.reservalab.dto.*;
+import br.edu.ifpe.reservalab.service.SimilarTicketService;
 import br.edu.ifpe.reservalab.service.TicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class TicketController {
 
     private final TicketService ticketService;
+    private final SimilarTicketService similarTicketService;
 
     @GetMapping
     public ResponseEntity<Page<TicketResponse>> listAll(
@@ -38,15 +38,22 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.findById(id));
     }
 
-    
+    // Frontend chama isso ANTES de exibir o form de criação
+    @PostMapping("/analyze")
+    public ResponseEntity<TicketAnalysisResponse> analyze(
+            @RequestBody @Valid TicketAnalysisRequest request
+    ) {
+        return ResponseEntity.ok(similarTicketService.analyze(request.description()));
+    }
+
     @PostMapping
-    public ResponseEntity<TicketResponse> create(@RequestBody @Valid TicketDTO dto) {
+    public ResponseEntity<TicketResponse> create(@RequestBody @Valid TicketRequest dto) {
         TicketResponse response = ticketService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TicketResponse> update(@PathVariable Long id, @RequestBody @Valid TicketDTO dto) {
+    public ResponseEntity<TicketResponse> update(@PathVariable Long id, @RequestBody @Valid TicketRequest dto) {
         return ResponseEntity.ok(ticketService.update(id, dto));
     }
 

@@ -19,6 +19,9 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Builder.Default
+    private boolean active = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "laboratory_id", nullable = false)
     private Laboratory laboratory;

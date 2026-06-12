@@ -31,9 +31,10 @@ public class TicketService {
     private final UserRepository userRepository;
     private final ComputerRepository computerRepository;
     private final TicketClassificationService classificationService;
+    private final SimilarTicketService similarTicketService;
 
     public Page<TicketResponse> findAll(Pageable pageable) {
-        return ticketRepository.findAll(pageable).map(TicketResponse::from);
+        return ticketRepository.findAllByActiveTrue(pageable).map(TicketResponse::from);
     }
 
     public Page<TicketResponse> findAllByFilter(TicketFilter filter, Pageable pageable) {
@@ -73,7 +74,10 @@ public class TicketService {
                 .prazoResolucao(calcularPrazo(classification.priority()))
                 .build();
 
-        return TicketResponse.from(ticketRepository.save(ticket));
+        Ticket saved = ticketRepository.save(ticket);
+        similarTicketService.saveEmbedding(saved.getId(), saved.getTitle(), saved.getDescription());
+
+        return TicketResponse.from(saved);
     }
 
     @Transactional
@@ -100,8 +104,15 @@ public class TicketService {
         };
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Ticket ticket = getOrThrow(id);
+        ticket.setActive(false);
+    }
+
+    // Atualizado: ignora tickets deletados em todas as buscas
     private Ticket getOrThrow(Long id) {
-        return ticketRepository.findById(id)
+        return ticketRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new EntityNotFoundException("Chamado não encontrado."));
     }
 }

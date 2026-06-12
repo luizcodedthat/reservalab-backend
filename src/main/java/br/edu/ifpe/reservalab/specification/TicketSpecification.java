@@ -14,6 +14,9 @@ public class TicketSpecification {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            // Sempre exclui tickets deletados
+            predicates.add(cb.isTrue(root.get("active")));
+
             if (filter.getStatus() != null) {
                 predicates.add(cb.equal(root.get("status"), filter.getStatus()));
             }
@@ -21,7 +24,8 @@ public class TicketSpecification {
                 predicates.add(cb.equal(root.get("priority"), filter.getPriority()));
             }
             if (filter.getLabId() != null) {
-                predicates.add(cb.equal(root.get("laboratoryId"), filter.getLabId()));
+                // Caminho correto após refatoração para @ManyToOne
+                predicates.add(cb.equal(root.get("laboratory").get("id"), filter.getLabId()));
             }
             if (filter.getYear() != null) {
                 predicates.add(cb.equal(

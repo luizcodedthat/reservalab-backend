@@ -25,9 +25,9 @@ public class TicketResponse {
     public static TicketResponse from(Ticket ticket) {
         TicketResponse response = new TicketResponse();
         response.setId(ticket.getId());
-        response.setLaboratoryId(ticket.getLaboratoryId());
-        response.setCreatedByUserId(ticket.getCreatedByUserId());
-        response.setAssignedToUserId(ticket.getAssignedToUserId());
+        response.setLaboratoryId(ticket.getLaboratory().getId());
+        response.setCreatedByUserId(ticket.getCreatedBy().getId());
+        response.setAssignedToUserId(ticket.getAssignedTo().getId());
         response.setTitle(ticket.getTitle());
         response.setDescription(ticket.getDescription());
         response.setStatus(ticket.getStatus());
