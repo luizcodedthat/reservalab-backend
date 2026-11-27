@@ -27,6 +27,7 @@ public class CommentVoteServiceImpl implements CommentVoteService {
     public void vote(Long commentId, Long userId, VoteType type) {
 
         LaboratoryComment comment = commentRepository.findById(commentId)
+                .filter(c -> !c.isDeleted())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Comentário não encontrado: id=" + commentId));
 

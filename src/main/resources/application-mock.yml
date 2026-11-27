@@ -1,0 +1,41 @@
+# Perfil de referência/demonstração: nenhuma conexão externa.
+#   - Banco H2 em memória (modo PostgreSQL), populado pelas mesmas migrations Flyway
+#   - IA simulada (MockLlmAdapter), sem API key nem rede
+#   - Segredo JWT local fixo (NUNCA usar em produção)
+# Uso: SPRING_PROFILES_ACTIVE=mock ./mvnw spring-boot:run
+spring:
+  datasource:
+    # O schema usa JSONB (PostgreSQL); o INIT cria um alias compatível no H2.
+    url: jdbc:h2:mem:reservalab;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1;INIT=CREATE DOMAIN IF NOT EXISTS JSONB AS JSON
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
+  flyway:
+    enabled: true
+
+ai:
+  provider: mock
+  free-llm:
+    base-url: http://localhost
+    api-key: mock-key-nao-usada
+    timeout-seconds: 1
+
+jwt:
+  secret: reservalab-mock-secret-somente-local-0123456789abcdef
+  expiration-ms: 86400000
+
+app:
+  cors:
+    # Vite (web) e Expo Web (mobile em navegador)
+    allowed-origins: http://localhost:5173,http://localhost:8081,http://localhost:19006
+
+logging:
+  level:
+    org.springframework.web: INFO

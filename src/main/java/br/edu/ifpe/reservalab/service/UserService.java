@@ -6,12 +6,17 @@ import br.edu.ifpe.reservalab.dto.UserResponseDTO;
 import br.edu.ifpe.reservalab.enums.UserRole;
 import br.edu.ifpe.reservalab.model.User;
 import br.edu.ifpe.reservalab.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,13 +40,13 @@ public class UserService {
 
     public UserResponseDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
         return UserResponseDTO.from(user);
     }
 
     public UserResponseDTO findByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
         return UserResponseDTO.from(user);
     }
 
@@ -111,7 +116,7 @@ public class UserService {
     @Transactional
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException("Usuário não encontrado.");
+            throw new EntityNotFoundException("Usuário não encontrado.");
         }
         userRepository.deleteById(id);
     }
@@ -129,7 +134,25 @@ public class UserService {
     /** Usado pelo AuthController no login (retorna a entidade, não o DTO) */
     public User getEntityByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
+    }
+
+    public Optional<User> findEntityByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    /** Usuário dono do token JWT da requisição atual. */
+    public User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof String email)) {
+            throw new AuthenticationCredentialsNotFoundException("Usuário não autenticado.");
+        }
+        return getEntityByEmail(email);
+    }
+
+    /** Secretaria e técnicos administram laboratórios, reservas e chamados de terceiros. */
+    public static boolean isStaff(User user) {
+        return user.hasRole(UserRole.SECRETARY) || user.hasRole(UserRole.TECHNICIAN);
     }
 
     public boolean checkPassword(User user, String rawPassword) {
@@ -138,6 +161,6 @@ public class UserService {
 
     private User getOrThrow(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
     }
 }

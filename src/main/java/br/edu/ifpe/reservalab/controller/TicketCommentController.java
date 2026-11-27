@@ -35,7 +35,7 @@ public class TicketCommentController {
     /**
      * POST /api/tickets/{ticketId}/comments
      * Cria um novo comentário no ticket
-     * Body: { userId, content }
+     * Body: { content } — autor = usuário autenticado
      */
     @PostMapping
     public ResponseEntity<TicketCommentResponseDTO> create(
@@ -55,7 +55,7 @@ public class TicketCommentController {
             @PathVariable Long ticketId,
             @PathVariable Long commentId
     ) {
-        commentService.delete(commentId);
+        commentService.delete(ticketId, commentId);
         return ResponseEntity.noContent().build();
     }
 }

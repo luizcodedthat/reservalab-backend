@@ -61,7 +61,7 @@ public class ChatService {
 
         StringBuilder sb = new StringBuilder("Histórico da conversa:\n");
         for (ChatMessage entry : recent) {
-            String label = entry.role().equals("user") ? "Usuário" : "Assistente";
+            String label = "user".equals(entry.role()) ? "Usuário" : "Assistente";
             sb.append(label).append(": ").append(entry.content()).append("\n");
         }
         sb.append("\nUsuário: ").append(request.message());

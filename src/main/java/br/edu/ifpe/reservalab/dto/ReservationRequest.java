@@ -12,7 +12,10 @@ public record ReservationRequest(
         @NotNull(message = "O laboratório é obrigatório")
         Long laboratoryId,
 
-        @NotNull(message = "O usuário solicitante é obrigatório")
+        /**
+         * Opcional. Se omitido, a reserva é feita em nome do usuário autenticado.
+         * Apenas SECRETARY/TECHNICIAN podem reservar em nome de outra pessoa.
+         */
         Long requestedByUserId,
 
         @NotNull(message = "A data da reserva é obrigatória")

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
@@ -47,7 +48,7 @@ public class ReservationController {
 
     @GetMapping("/today")
     public ResponseEntity<Page<ReservationResponse>> listToday(
-            @PageableDefault(size = 20, sort = "laboratoryId") Pageable pageable) {
+            @PageableDefault(size = 20, sort = "laboratory.id") Pageable pageable) {
         LocalDate today = LocalDate.now();
         ReservationFilter todayFilter = new ReservationFilter(
                 null, null, null, today, today, null);
@@ -91,6 +92,7 @@ public class ReservationController {
     }
 
     @DeleteMapping
+    @PreAuthorize("hasAnyRole('SECRETARY', 'TECHNICIAN')")
     public ResponseEntity<Map<String, Integer>> cancelByFilter(
             @RequestParam(required = false) Long laboratoryId,
             @RequestParam(required = false) Long requestedByUserId,
