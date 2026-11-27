@@ -17,7 +17,7 @@ public class UpdateUserRequestDTO {
     @Email(message = "Email inválido")
     private String email;
 
-    @Size(min = 6, message = "Senha deve ter ao menos 6 caracteres")
+    @Size(min = 8, message = "Senha deve ter ao menos 8 caracteres")
     private String password; // null = não altera a senha
 
     private UserRole role;

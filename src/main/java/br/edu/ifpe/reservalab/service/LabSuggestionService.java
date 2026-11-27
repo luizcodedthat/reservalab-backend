@@ -7,6 +7,7 @@ import br.edu.ifpe.reservalab.dto.labSuggestion.LabSuggestionRequest;
 import br.edu.ifpe.reservalab.dto.labSuggestion.LabSuggestionResponse;
 import br.edu.ifpe.reservalab.enums.ReservationStatus;
 import br.edu.ifpe.reservalab.exception.ai.AiProviderException;
+import br.edu.ifpe.reservalab.model.Laboratory;
 import br.edu.ifpe.reservalab.repository.LaboratoryRepository;
 import br.edu.ifpe.reservalab.repository.ReservationRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,6 +51,7 @@ public class LabSuggestionService {
             LocalDate date, LocalTime start, LocalTime end
     ) {
         return laboratoryRepository.findAll().stream()
+                .filter(Laboratory::isActive)
                 .filter(lab -> reservationRepository.findConflictingReservationIds(
                         lab.getId(), date, start, end, IGNORED_ON_CONFLICT
                 ).isEmpty())

@@ -29,14 +29,17 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto) {
-        User user = userService.getEntityByEmail(dto.getEmail());
+        // Email inexistente e senha errada respondem igual (401) para não revelar contas cadastradas.
+        User user = userService.findEntityByEmail(dto.getEmail())
+                .filter(u -> userService.checkPassword(u, dto.getPassword()))
+                .orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         if (!user.isActive()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        if (!userService.checkPassword(user, dto.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());

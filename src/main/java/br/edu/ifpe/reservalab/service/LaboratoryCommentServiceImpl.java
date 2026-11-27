@@ -12,12 +12,10 @@ import br.edu.ifpe.reservalab.model.User;
 import br.edu.ifpe.reservalab.repository.CommentVoteRepository;
 import br.edu.ifpe.reservalab.repository.LaboratoryCommentRepository;
 import br.edu.ifpe.reservalab.repository.LaboratoryRepository;
-import br.edu.ifpe.reservalab.repository.UserRepository;
+import br.edu.ifpe.reservalab.exception.ForbiddenOperationException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,7 +33,7 @@ public class LaboratoryCommentServiceImpl implements LaboratoryCommentService {
     private final LaboratoryCommentRepository commentRepository;
     private final CommentVoteRepository       voteRepository;
     private final LaboratoryRepository        laboratoryRepository;
-    private final UserRepository              userRepository;
+    private final UserService                 userService;
 
     @Override
     @Transactional(readOnly = true)
@@ -56,12 +53,14 @@ public class LaboratoryCommentServiceImpl implements LaboratoryCommentService {
         Map<Long, Long> downvotes = countVotesByType(commentIds, VoteType.DOWNVOTE);
 
         // Map do voto do usuário para cada comentário
-        Map<Long, VoteType> userVotes = voteRepository.findVotesByUserAndCommentIds(userId, commentIds)
-                .stream()
-                .collect(Collectors.toMap(
-                        UserCommentVote::commentId,
-                        UserCommentVote::voteType
-                ));
+        Map<Long, VoteType> userVotes = (userId == null || commentIds.isEmpty())
+                ? Map.of()
+                : voteRepository.findVotesByUserAndCommentIds(userId, commentIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                UserCommentVote::commentId,
+                                UserCommentVote::voteType
+                        ));
 
         // Monta o DTO incluindo o voto do usuário
         return comments.map(comment -> LaboratoryCommentResponse.from(
@@ -80,12 +79,7 @@ public class LaboratoryCommentServiceImpl implements LaboratoryCommentService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Laboratório não encontrado: id=" + laboratoryId));
 
-        // Pega usuário logado do JWT
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        User loggedUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Usuário não encontrado com email: " + email));
+        User loggedUser = userService.getCurrentUser();
 
         LaboratoryComment comment = LaboratoryComment.builder()
                 .laboratory(laboratory)
@@ -108,9 +102,14 @@ public class LaboratoryCommentServiceImpl implements LaboratoryCommentService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Comentário não encontrado: id=" + commentId));
 
-        if (!comment.getLaboratory().getId().equals(laboratoryId)) {
-            throw new IllegalStateException(
-                    "Comentário id=" + commentId + " não pertence ao laboratório id=" + laboratoryId);
+        if (comment.isDeleted() || !comment.getLaboratory().getId().equals(laboratoryId)) {
+            throw new EntityNotFoundException(
+                    "Comentário id=" + commentId + " não encontrado no laboratório id=" + laboratoryId);
+        }
+
+        User currentUser = userService.getCurrentUser();
+        if (!comment.getAuthor().getId().equals(currentUser.getId()) && !UserService.isStaff(currentUser)) {
+            throw new ForbiddenOperationException("Apenas o autor ou a equipe podem remover este comentário.");
         }
 
         comment.setDeleted(true);

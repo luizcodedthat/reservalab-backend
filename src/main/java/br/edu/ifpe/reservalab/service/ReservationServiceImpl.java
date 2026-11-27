@@ -11,6 +11,7 @@ import br.edu.ifpe.reservalab.model.ReservationTimeBlock;
 import br.edu.ifpe.reservalab.enums.ReservationStatus;
 import br.edu.ifpe.reservalab.exception.ConflictingReservationException;
 import br.edu.ifpe.reservalab.exception.ConflictingReservationException.ConflictDetail;
+import br.edu.ifpe.reservalab.exception.ForbiddenOperationException;
 import br.edu.ifpe.reservalab.repository.ReservationRepository;
 import br.edu.ifpe.reservalab.specification.ReservationSpecification;
 import br.edu.ifpe.reservalab.model.User;
@@ -42,6 +43,7 @@ public class ReservationServiceImpl implements ReservationService {
         private final ReservationRepository reservationRepository;
         private final LaboratoryRepository laboratoryRepository;
         private final UserRepository userRepository;
+        private final UserService userService;
 
         @Override
         @Transactional
@@ -55,9 +57,19 @@ public class ReservationServiceImpl implements ReservationService {
                                         "Laboratório inativo: " + laboratory.getCode());
                 }
 
-                User requestedBy = userRepository.findById(request.requestedByUserId())
-                                .orElseThrow(() -> new EntityNotFoundException(
-                                                "Usuário não encontrado: id=" + request.requestedByUserId()));
+                User currentUser = userService.getCurrentUser();
+                User requestedBy = currentUser;
+
+                if (request.requestedByUserId() != null
+                                && !request.requestedByUserId().equals(currentUser.getId())) {
+                        if (!UserService.isStaff(currentUser)) {
+                                throw new ForbiddenOperationException(
+                                                "Apenas secretaria ou técnicos podem reservar em nome de outro usuário.");
+                        }
+                        requestedBy = userRepository.findById(request.requestedByUserId())
+                                        .orElseThrow(() -> new EntityNotFoundException(
+                                                        "Usuário não encontrado: id=" + request.requestedByUserId()));
+                }
 
                 if (!requestedBy.isActive()) {
                         throw new IllegalStateException(
@@ -108,6 +120,8 @@ public class ReservationServiceImpl implements ReservationService {
                 Reservation reservation = reservationRepository.findByIdFetched(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada: id=" + id));
 
+                assertOwnerOrStaff(reservation);
+
                 if (!reservation.isCancellable()) {
                         throw new IllegalStateException(
                                         "Não é possível cancelar reserva com status: " + reservation.getStatus());
@@ -125,6 +139,8 @@ public class ReservationServiceImpl implements ReservationService {
 
                 Reservation reservation = reservationRepository.findByIdFetched(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada: id=" + id));
+
+                assertOwnerOrStaff(reservation);
 
                 if (reservation.getStatus() != ReservationStatus.PENDING) {
                         throw new IllegalStateException(
@@ -197,6 +213,14 @@ public class ReservationServiceImpl implements ReservationService {
         @Transactional
         public int cancelByFilter(ReservationFilter filter) {
                 log.debug("Cancelando reservas por filtro: {}", filter);
+
+                // Sem nenhum filtro, a especificação casaria com todas as reservas do sistema.
+                if (filter.laboratoryId() == null && filter.requestedByUserId() == null
+                                && filter.dateFrom() == null && filter.dateTo() == null
+                                && filter.groupId() == null) {
+                        throw new IllegalArgumentException(
+                                        "Informe ao menos um filtro para cancelamento em lote.");
+                }
 
                 if (filter.groupId() != null) {
                         return cancelByGroupId(filter.groupId());
@@ -297,6 +321,14 @@ public class ReservationServiceImpl implements ReservationService {
                 int count = reservationRepository.bulkUpdateStatus(ids, ReservationStatus.CANCELLED);
                 log.info("Cancelamento em lote: {} reservas canceladas para groupId={}", count, groupId);
                 return count;
+        }
+
+        private void assertOwnerOrStaff(Reservation reservation) {
+                User currentUser = userService.getCurrentUser();
+                boolean isOwner = reservation.getRequestedBy().getId().equals(currentUser.getId());
+                if (!isOwner && !UserService.isStaff(currentUser)) {
+                        throw new ForbiddenOperationException("Esta reserva pertence a outro usuário.");
+                }
         }
 
         private Specification<Reservation> onlyCancellable() {
